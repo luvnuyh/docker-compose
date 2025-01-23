@@ -1,0 +1,53 @@
+name: docker, ci/cd, ec2, hub
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  docker-cicd:
+    runs-on: ubuntu-latest
+    steps:
+      # 소스 코드 체크아웃
+      - name: 소스 코드 체크 아웃
+        uses: actions/checkout@v4
+      # jdk 17 설치
+      - name: jdk 17 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      # 필요시 현재까지 환경 수시 확인 ㄱㄴ -> 리눅스 명령어 (로그 체크)
+      - name: 현재 상황 체크
+        run: |
+          pwd
+          ls
+      # 환경 변수 동적 세팅 ㄴ (여기서는 제외)
+      # 빌드, 단위 테스트 -> 편의상 개발자 pc에서(프론트, 백에서) 선행 수행(생략)
+      # 도커 관련 액션 <-> 도커 작업을 위한 환경
+      - name: 도커 작업 진행을 위한 액션 적용
+        uses: docker/setup-buildx-action@v3
+
+      # 도커 허브에 진입해서  -> 프로필 -> 액세스 토큰 발급 받기
+      # 토큰 발급: 프로필 > account settings > security personal
+      # generate token >
+      # 도커 허브 로그인 -> 계정 정보 필요 -> 시크릿 변수로 세팅
+      - name: 도커 허브 로그인
+        run: echo "${{secrets.HUB_DOCKER_TOKEN}}" | docker login -u "${{secrets.HUB_DOCKER_NAME}}" --password-stdin
+
+      # 백엔드 이미지 생성 -> 허브(레포지토리) 푸시
+      - name: 백엔드 이미지 생성 -> 허브(레포지토리) 푸시
+        run: |
+          docker build -t sohyun5429/demo_backend ./backend 
+          docker push sohyun5429/demo_backend
+
+      # 프론트 이미지 생성 -> 허브(레포지토리) 푸시
+      - name: 프론트엔드 이미지 생성 -> 허브(레포지토리) 푸시
+        run: |
+          docker build -t sohyun5429/demo_frontend ./frontend 
+          docker push sohyun5429/demo_frontend
+      # ec2 서버로 필요 파일 업로드(yml, nginx/*.conf)
+    
+    #deploy:
+      # 도커 컴포즈 진행
