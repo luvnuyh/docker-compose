@@ -92,7 +92,7 @@ jobs:
       # sudo apt-get update
       # Docker 설치
       # sudo apt-get install docker-ce docker-ce-cli containerd.io -y
-    
+      # 도커 컴포즈 진행
     deploy:
       runs-on: ubuntu-latest
       # 해당 잡이 진행되려면 사전에 반드시 다른 잡이 선행되어야 함.
