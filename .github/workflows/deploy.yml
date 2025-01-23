@@ -106,7 +106,7 @@ jobs:
             key: ${{ secrets.EC2_KEY }}
             script_stop: true
             # 이미지 갱ㅇ신 ㄴㄴ -> 도커 컴포즈 파일에 기술하여 버전 관리 ㄱㄴ
-            # 이미지에 tag를 기입하여 버전을 관리한다면 매번 ...
+            # 이미지에 tag를 기입하여 버전을 관리한다면 매번 갱신 가능(이미지)
             script: |
               sudo docker compose down
-              sudo docker compse up -d
+              sudo docker compose up -d
